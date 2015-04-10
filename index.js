@@ -1,8 +1,8 @@
 var path = require('path');
 var componentsInfo, componentsDir;
 
-module.exports = function(fis, opts) {
 
+function onReleaseStart() {
   // 读取组件信息
   componentsInfo = {};
   componentsDir = (fis.config.env().get('component.dir') || '/components').replace(/\/$/, '');
@@ -28,11 +28,7 @@ module.exports = function(fis, opts) {
     json.name = json.name || cName;
     componentsInfo[json.name] = json;
   });
-
-
-  fis.removeListener('lookup:file', onFileLookUp);
-  fis.on('lookup:file', onFileLookUp);
-};
+}
 
 function findResource(name, path, finder) {
   finder = finder || fis.uri;
@@ -72,3 +68,9 @@ function onFileLookUp(info, file) {
     }
   }
 }
+
+
+module.exports = function(fis, opts) {
+  fis.on('release:start', onReleaseStart);
+  fis.on('lookup:file', onFileLookUp);
+};
