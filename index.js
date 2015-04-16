@@ -28,15 +28,16 @@ function onReleaseStart() {
     json.name = json.name || cName;
     componentsInfo[json.name] = json;
   });
+
+  fis.emit('components:info', componentsInfo);
 }
 
-function findResource(name, path, finder) {
-  finder = finder || fis.uri;
+function findResource(name, path) {
   var extList = ['.js', '.jsx', '.coffee', '.css', '.sass', '.scss', '.less', '.html', '.tpl', '.vm'];
-  var info = finder(name, path);
+  var info = fis.uri(name, path);
 
   for (var i = 0, len = extList.length; i < len && !info.file; i++) {
-    info = finder(name + extList[i], path);
+    info = fis.uri(name + extList[i], path);
   }
 
   return info;
@@ -44,7 +45,7 @@ function findResource(name, path, finder) {
 
 function onFileLookUp(info, file) {
   // 如果已经找到了，没必要再找了。
-  if (info.file || file.useShortPath === false) {
+  if (info.file || file && file.useShortPath === false) {
     return;
   }
 
@@ -56,9 +57,9 @@ function onFileLookUp(info, file) {
     var resolved;
 
     if (subpath) {
-      resolved = findResource(componentsDir + '/' + cName + '/' + subpath, file.dirname);
+      resolved = findResource(componentsDir + '/' + cName + '/' + subpath, file ? file.dirname : fis.project.getProjectPath());
     } else {
-      resolved = findResource(componentsDir + '/' + cName + '/' + (config.main || 'index'), file.dirname);
+      resolved = findResource(componentsDir + '/' + cName + '/' + (config.main || 'index'), file ? file.dirname : fis.project.getProjectPath());
     }
 
     // 根据规则找到了。
