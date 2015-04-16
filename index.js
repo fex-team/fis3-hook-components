@@ -5,24 +5,21 @@ var componentsInfo, componentsDir;
 function onReleaseStart() {
   // 读取组件信息
   componentsInfo = {};
-  componentsDir = (fis.config.env().get('component.dir') || '/components').replace(/\/$/, '');
+  componentsDir = (fis.config.env().get('component.dir') || 'components').replace(/\/$/, '');
 
   if (componentsDir[0] !== '/') {
-    componentsDir = '/' + componentsDir;
+    componentsDir += '/';
   }
 
-  var root = fis.project.getProjectPath();
-  var includer = new RegExp('^' + fis.util.escapeReg(root + componentsDir + '/') + '.*?component\.json$', 'i');
-
-  // 获取所有 component.json 文件。
-  fis.util.find(root, includer).forEach(function(file) {
-    var cName = path.basename(path.dirname(file));
+  var files = fis.project.getSourceByParttens(componentsDir + '**/component.json');
+  Object.keys(files, function(subpath, file) {
+    var cName = path.basename(path.dirname(file.realpath));
     var json;
 
     try {
-      json = require(file)
+      json = JSON.parse(file.getContent());
     } catch (e) {
-      fis.log.warning('unable to load component.json of [' + cName + ']');
+      fis.log.warning('unable to load component.json of component `%s`.', cName);
     }
 
     json.name = json.name || cName;
