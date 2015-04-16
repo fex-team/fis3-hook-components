@@ -5,23 +5,23 @@ var componentsInfo, componentsDir;
 function onReleaseStart() {
   // 读取组件信息
   componentsInfo = {};
-  componentsDir = (fis.config.env().get('component.dir') || 'components').replace(/\/$/, '');
+  componentsDir = (fis.config.env().get('component.dir') || 'components/').replace(/\/$/, '');
 
-  if (componentsDir[0] !== '/') {
+  if (componentsDir.substr(-1) !== '/') {
     componentsDir += '/';
   }
 
   var files = fis.project.getSourceByParttens(componentsDir + '**/component.json');
-  Object.keys(files, function(subpath, file) {
-    var cName = path.basename(path.dirname(file.realpath));
+  Object.keys(files).forEach(function(subpath) {
+    var file = files[subpath];
+    var cName = path.basename(subpath);
     var json;
 
     try {
       json = JSON.parse(file.getContent());
     } catch (e) {
-      fis.log.warning('unable to load component.json of component `%s`.', cName);
+      fis.log.warn('unable to load component.json of component `%s`.', cName);
     }
-
     json.name = json.name || cName;
     componentsInfo[json.name] = json;
   });
@@ -54,9 +54,9 @@ function onFileLookUp(info, file) {
     var resolved;
 
     if (subpath) {
-      resolved = findResource(componentsDir + '/' + cName + '/' + subpath, file ? file.dirname : fis.project.getProjectPath());
+      resolved = findResource('/' + componentsDir+ cName + '/' + subpath, file ? file.dirname : fis.project.getProjectPath());
     } else {
-      resolved = findResource(componentsDir + '/' + cName + '/' + (config.main || 'index'), file ? file.dirname : fis.project.getProjectPath());
+      resolved = findResource('/' + componentsDir + cName + '/' + (config.main || 'index'), file ? file.dirname : fis.project.getProjectPath());
     }
 
     // 根据规则找到了。
