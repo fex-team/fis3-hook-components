@@ -11,7 +11,7 @@ function onReleaseStart() {
     componentsDir += '/';
   }
 
-  var files = fis.project.getSourceByParttens(componentsDir + '**/component.json');
+  var files = fis.project.getSourceByPatterns(componentsDir + '**/component.json');
   Object.keys(files).forEach(function(subpath) {
     var file = files[subpath];
     var cName = path.basename(subpath);
