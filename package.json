@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/2betop/fis3-plugin-components/issues"
   },
-  "homepage": "https://github.com/2betop/fis3-plugin-components"
+  "homepage": "https://github.com/2betop/fis3-plugin-components",
+  "devDependencies": {
+    "fis":"1.9.21"
+  }
 }
