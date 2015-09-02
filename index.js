@@ -57,6 +57,10 @@ function onFileLookUp(info, file) {
       resolved = findResource('/' + componentsDir+ cName + '/' + subpath, file ? file.dirname : fis.project.getProjectPath());
     } else {
       resolved = findResource('/' + componentsDir + cName + '/' + (config.main || 'index'), file ? file.dirname : fis.project.getProjectPath());
+
+      if (!resolved.file) {
+        resolved = findResource('/' + componentsDir + cName + '/' + cName, file ? file.dirname : fis.project.getProjectPath());
+      }
     }
 
     // 根据规则找到了。
