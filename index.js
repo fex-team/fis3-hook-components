@@ -34,7 +34,12 @@ function findResource(name, path) {
   var info = fis.uri(name, path);
 
   for (var i = 0, len = extList.length; i < len && !info.file; i++) {
-    info = fis.uri(name + extList[i], path);
+    if (name.indexOf(extList[i]) > 0) {
+      info = fis.uri(name.slice(0, -extList[i].length) + extList[i], path);
+    } else {
+      info = fis.uri(name + extList[i], path);  
+    }
+    
   }
 
   return info;
