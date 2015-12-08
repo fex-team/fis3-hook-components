@@ -14,7 +14,7 @@ function onReleaseStart() {
   var files = fis.project.getSourceByPatterns(componentsDir + '**/component.json');
   Object.keys(files).forEach(function(subpath) {
     var file = files[subpath];
-    var cName = path.basename(subpath);
+    var cName = path.basename(path.dirname(subpath));
     var json;
 
     try {
@@ -22,6 +22,17 @@ function onReleaseStart() {
     } catch (e) {
       fis.log.warn('unable to load component.json of component `%s`.', cName);
     }
+
+    if (json.hook && typeof json.hook === 'string') {
+      try {
+        var root = fis.project.getProjectPath();
+        var hook = require(path.join(root, componentsDir, cName, json.hook));
+        hook && hook(json, files);
+      } catch (e) {
+        // don't care
+      }
+    }
+    
     json.name = json.name || cName;
     componentsInfo[json.name] = json;
   });
@@ -41,12 +52,13 @@ function findResource(name, path) {
 }
 
 function onFileLookUp(info, file) {
+
   // 如果已经找到了，没必要再找了。
   if (info.file || file && file.useShortPath === false) {
     return;
   }
 
-  var m = /^([0-9a-zA-Z-_]+)(?:\/(.+))?$/.exec(info.rest);
+  var m = /^([0-9a-zA-Z\.\-_]+)(?:\/(.+))?$/.exec(info.rest);
   if (m) {
     var cName = m[1];
     var subpath = m[2];
