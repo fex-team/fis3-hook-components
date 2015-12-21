@@ -40,12 +40,32 @@ function onReleaseStart() {
   fis.emit('components:info', componentsInfo);
 }
 
-function findResource(name, path) {
+function _findResource(name, path) {
   var extList = ['.js', '.jsx', '.coffee', '.css', '.sass', '.scss', '.less', '.html', '.tpl', '.vm'];
   var info = fis.uri(name, path);
 
   for (var i = 0, len = extList.length; i < len && !info.file; i++) {
     info = fis.uri(name + extList[i], path);
+  }
+
+  return info;
+}
+
+function findResource(name, dir) {
+  var list = [
+    name, 
+    path.join(name, 'index'), 
+    path.join(name, path.basename(name))
+  ];
+  var info;
+
+  while (list.length) {
+    name = list.shift();
+    info = _findResource(name, dir);
+
+    if (info && info.file) {
+      break;
+    }
   }
 
   return info;
