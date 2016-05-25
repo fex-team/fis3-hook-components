@@ -11,7 +11,9 @@ function onReleaseStart() {
     componentsDir += '/';
   }
 
-  var files = fis.project.getSourceByPatterns(componentsDir + '**/component.json');
+  var files = fis.project.getSourceByPatterns(componentsDir + '*/component.json', {
+    ignore: ['node_modules/**']
+  });
   Object.keys(files).forEach(function(subpath) {
     var file = files[subpath];
     var cName = path.basename(path.dirname(subpath));
@@ -32,7 +34,7 @@ function onReleaseStart() {
         // don't care
       }
     }
-    
+
     json.name = json.name || cName;
     componentsInfo[json.name] = json;
   });
@@ -53,8 +55,8 @@ function _findResource(name, path) {
 
 function findResource(name, dir) {
   var list = [
-    name, 
-    path.join(name, 'index'), 
+    name,
+    path.join(name, 'index'),
     path.join(name, path.basename(name))
   ];
   var info;
